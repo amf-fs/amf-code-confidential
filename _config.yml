@@ -10,8 +10,8 @@ permalink:        pretty
 title:            AMF
 tagline:          'Code Confidential'
 description:      'Amf code confidential, document the journey of a free DEV, working from home having fun with code and contrary opinionated (No Hype).'
-url:              http://hyde.getpoole.com
-baseurl:          /
+url:              https://amf-fs.github.io
+baseurl:          /amf-code-confidential/  # the subpath of your site, e.g. /blog
 
 author:
   name:           'Alan Morais Fialho'
