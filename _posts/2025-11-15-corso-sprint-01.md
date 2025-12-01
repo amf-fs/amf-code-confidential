@@ -3,7 +3,7 @@ layout: post
 title: Corso! Sprint 01
 ---
 
-This is the continuation of the [Corso! the journey begins](https://amf-fs.github.io/amf-code-confidential/2025/10/26/corso-journey-begins/), showcasing the results of the first sprint.
+This is the continuation of the [Corso! the journey begins]({{'/2025/10/26/corso-journey-begins' | relative_url}}), showcasing the results of the first sprint.
 
 ### Architecture Decisions
 
@@ -33,7 +33,7 @@ Instead, I chose web first. A web platform lets me showcase skills and ship fast
 
 **Storage:** This is where I wanted to explore fundamentals. Instead of PostgreSQL or MSSQL, I'm storing encrypted accounts in files, the same strategy KeePass uses. Databases offer scalability I don't need as a solo user. This choice simplifies setup and showcases encryption handling.
 
-![corso-arch]({{ site.baseurl }}/assets/images/corso-sprint-01/corso-arch.drawio.svg)
+![corso-arch]({{'/assets/images/corso-sprint-01/corso-arch.drawio.svg' | relative_url}})
 
 ### The Frontend
 

@@ -11,13 +11,13 @@ title:            AMF
 tagline:          'Code Confidential'
 description:      'Amf code confidential, document the journey of a free DEV, working from home having fun with code and contrary opinionated (No Hype).'
 url:              https://amf-fs.github.io
-baseurl:          /amf-code-confidential/  # the subpath of your site, e.g. /blog
+baseurl:          '/amf-code-confidential'  # the subpath of your site, e.g. /blog
 
 author:
   name:           'Alan Morais Fialho'
   url:            https://www.linkedin.com/in/alan-morais-9b2070121/
 
-paginate:         3
+paginate:         1
 
 # Custom vars
 version:          2.1.0
