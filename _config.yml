@@ -1,5 +1,8 @@
 # Dependencies
 markdown:         kramdown
+sparse_block_html: true
+parse_span_html: true
+auto_ids: true
 highlighter:      rouge
 
 # Permalinks

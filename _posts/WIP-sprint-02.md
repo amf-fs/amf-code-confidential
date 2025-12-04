@@ -107,4 +107,44 @@ namespace CorsoApi.Infrastructure
 }
 
 ```
-An interesting note is that Argon2 takes hardware configuration as input to generate the hash, the hash that was computed in my local machine was not same when deployed to the server, because the processor count were different, then I had to recompute the hash on server and store it. 
+An interesting nuance is that Argon2 takes hardware configuration as input to generate the hash, the hash that was computed in my local machine was not same when deployed to the server, because the processor count were different, then I had to recompute the hash on server and store it.
+
+### Killing the mosquito with a bomb
+
+In Corso!’s first iteration, I created an abstraction called **SecretStore**. The idea was simple: in the local environment I’d use **keyring** to handle secrets, and once I decided where the app would live, I could just switch the implementation at runtime through DI. Azure gives me free hosting for a .NET app, and I can even use Key Vault or environment variables that encrypt at rest. The `IConfiguration` abstraction provided by the SDK already handles all those nuances, and I can still use .NET User Secrets to avoid checking sensitive data into source control.
+
+The code was refactored to read configuration directly from `IConfiguration` instead of `SecretStore`, and the class was removed from the project. Good architects remove more than they add.
+
+```c#
+var builder = WebApplication.CreateBuilder(args);
+
+//Infrastructure services
+builder.Services.AddSingleton<IAccountsVault, AccountsVault>(opts =>
+{
+    //hash now reads from Configuration
+    var masterHash = builder.Configuration["masterHash"]
+        ?? throw new InvalidOperationException("masterHash configuration is missing");
+
+    return new AccountsVault("db.dat", masterHash);
+});
+builder.Services.AddScoped<IHasher, Argon2Hasher>();
+```
+
+Secrets local setup:
+
+```bash
+dotnet user-secrets init
+```
+To add the necessary secret to your user-secrets:
+
+```bash
+dotnet user-secrets set "salt" "{{some_value}}"
+dotnet user-secrets set "masterHash" "{{some_value}}"
+dotnet user-secrets list 
+```
+Once the code is deployed to Azure, I set the sensitive data as environment variables (encrypted at rest), and no code changes are required.
+
+![corso web env variables]({{'assets/images/corso-sprint-02/corso-web-env-variables.png' | relative_url}})
+
+#### Warning!!
+There’s a real trade-off here. The more you lean on a cloud provider’s “easy” features, the deeper you slide into vendor lock‑in. Sometimes that’s fine (even unavoidable) but it’s dangerous to let it creep into the core of your app without noticing. If you’re still unsure where your code will live long‑term, keep your options open: run the app on multiple hosts, compare costs, and don’t be afraid to walk away from the cloud entirely, just like [DHH did](https://world.hey.com/dhh/we-have-left-the-cloud-251760fb){:target="_blank"}.
