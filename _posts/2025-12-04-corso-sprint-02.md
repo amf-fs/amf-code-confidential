@@ -113,7 +113,7 @@ An interesting nuance is that Argon2 takes hardware configuration as input to ge
 
 In Corso!’s first iteration, I created an abstraction called **SecretStore**. The idea was simple: in the local environment I’d use **keyring** to handle secrets, and once I decided where the app would live, I could just switch the implementation at runtime through DI. Azure gives me free hosting for a .NET app, and I can even use Key Vault or environment variables that encrypt at rest. The `IConfiguration` abstraction provided by the SDK already handles all those nuances, and I can still use .NET User Secrets to avoid checking sensitive data into source control.
 
-The code was refactored to read configuration directly from `IConfiguration` instead of `SecretStore`, and the class was removed from the project. Good architects remove more than they add.
+The code was refactored to read configuration directly from `IConfiguration` instead of `SecretStore`, and the class was removed from the project. *"Good architects remove more than they add."*
 
 ```c#
 var builder = WebApplication.CreateBuilder(args);
@@ -156,16 +156,16 @@ I wanted to stay honest with my deadline, and at this point I had only two days 
 ### The mission
 Find a free hosting provider. One of the main goals of this project is keeping costs minimal, so it made sense to move away from my 1Password subscription.
 
-It needed to be .NET‑friendly. Most free hosts require dockerizing the app, and I didn’t have time for that.
+- It needed to be .NET‑friendly. Most free hosts require dockerizing the app, and I didn’t have time for that.
 
-It had to run under a single domain, since the session cookie wouldn’t travel across domains and API calls would fail.
+- It had to run under a single domain, since the session cookie wouldn’t travel across domains and API calls would fail.
 
-It needed to provide free HTTPS support.
+- It needed to provide free HTTPS support.
 
 As mentioned earlier, I ended up hosting everything on an Azure App Service. It integrates nicely with GitHub Actions, and setting up a YAML workflow is straightforward.
 
 ### Serving Angular + API under the same domain
-The next challenge was deploying both the Angular app and the API to the same server under the same domain. The solution was to use the backend itself to serve the static files. Ideally, these files should live in a CDN — see Static Web App{:target="_blank"} — but as a solo user, performance isn’t critical right now. There will be plenty of opportunities to optimize later.
+The next challenge was deploying both the Angular app and the API to the same server under the same domain. The solution was to use the backend itself to serve the static files. Ideally, these files should live in a CDN see [Static Web App](https://azure.microsoft.com/en-us/products/app-service/static){:target="_blank"} but as a solo user, performance isn’t critical right now. There will be plenty of opportunities to optimize later.
 
 To automate deployment, I updated my angular.json so the build output goes directly into the backend’s wwwroot folder. Since I’m using a monorepo setup, this worked beautifully.
 
@@ -298,3 +298,14 @@ app.MapFallbackToFile("index.html");
 await app.RunAsync();
 ```
 The order of these middlewares is important to avoid conflicts and unexpected behavior.
+
+## Coming Next
+
+Corso! is now live at [https://corsoweb.azurewebsites.net/](https://corsoweb.azurewebsites.net/){:target="_blank"} taking into consideration I work only part-time on it this is good progress.
+
+I notice, I cannot be so aggressive because I need balance with my consulting activities, and also I'd like to make some adjustments and improvements to this blog.
+
+### Sprint 03
+Now Corso! is available over the wire, but I am still not confident to deposit my credentials on it. Anyone can access this web page even if protected behind the master password. The goal of next sprint will be white listing the access, only myself will be able to see the web site.
+
+You can find the code on <a href="https://github.com/amf-fs/corso" target="_blank" rel="noopener">GitHub</a>, see ya!
