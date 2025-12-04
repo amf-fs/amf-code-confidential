@@ -109,7 +109,7 @@ namespace CorsoApi.Infrastructure
 ```
 An interesting nuance is that Argon2 takes hardware configuration as input to generate the hash, the hash that was computed in my local machine was not same when deployed to the server, because the processor count were different, then I had to recompute the hash on server and store it.
 
-### Killing the mosquito with a bomb
+## Killing the mosquito with a bomb
 
 In Corso!’s first iteration, I created an abstraction called **SecretStore**. The idea was simple: in the local environment I’d use **keyring** to handle secrets, and once I decided where the app would live, I could just switch the implementation at runtime through DI. Azure gives me free hosting for a .NET app, and I can even use Key Vault or environment variables that encrypt at rest. The `IConfiguration` abstraction provided by the SDK already handles all those nuances, and I can still use .NET User Secrets to avoid checking sensitive data into source control.
 
@@ -148,3 +148,153 @@ Once the code is deployed to Azure, I set the sensitive data as environment vari
 
 #### Warning!!
 There’s a real trade-off here. The more you lean on a cloud provider’s “easy” features, the deeper you slide into vendor lock‑in. Sometimes that’s fine (even unavoidable) but it’s dangerous to let it creep into the core of your app without noticing. If you’re still unsure where your code will live long‑term, keep your options open: run the app on multiple hosts, compare costs, and don’t be afraid to walk away from the cloud entirely, just like [DHH did](https://world.hey.com/dhh/we-have-left-the-cloud-251760fb){:target="_blank"}.
+
+## Scarcity = Innovation - The deployment workflow
+
+I wanted to stay honest with my deadline, and at this point I had only two days left to finish the sprint.
+
+### The mission
+Find a free hosting provider. One of the main goals of this project is keeping costs minimal, so it made sense to move away from my 1Password subscription.
+
+It needed to be .NET‑friendly. Most free hosts require dockerizing the app, and I didn’t have time for that.
+
+It had to run under a single domain, since the session cookie wouldn’t travel across domains and API calls would fail.
+
+It needed to provide free HTTPS support.
+
+As mentioned earlier, I ended up hosting everything on an Azure App Service. It integrates nicely with GitHub Actions, and setting up a YAML workflow is straightforward.
+
+### Serving Angular + API under the same domain
+The next challenge was deploying both the Angular app and the API to the same server under the same domain. The solution was to use the backend itself to serve the static files. Ideally, these files should live in a CDN — see Static Web App{:target="_blank"} — but as a solo user, performance isn’t critical right now. There will be plenty of opportunities to optimize later.
+
+To automate deployment, I updated my angular.json so the build output goes directly into the backend’s wwwroot folder. Since I’m using a monorepo setup, this worked beautifully.
+
+```json
+"options": {
+    //Change output path default is dist folder
+    "outputPath": {
+        "base": "../backend/wwwroot",
+        "browser": ""
+    },
+    "index": "src/index.html",
+    "browser": "src/main.ts",
+    "polyfills": [
+        "zone.js"
+    ],
+    "tsConfig": "tsconfig.app.json",
+    "inlineStyleLanguage": "scss",
+    "assets": [
+        {
+        "glob": "**/*",
+        "input": "public"
+        }
+    ],
+    "styles": [
+        "src/styles.scss",
+        "node_modules/@angular/material/prebuilt-themes/cyan-orange.css"
+    ],
+    "scripts": []
+},
+```
+Now the workflow is able to build angular and later the backend here is the GitHub Actions workflow:
+
+```yml
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy ASP.Net Core app to Azure Web App - corsoweb
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read #This is required for actions/checkout
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+
+      - name: Install Angular dependencies
+        run: npm install
+        working-directory: ./web
+      
+      - name: Build Angular app
+        run: npm run build -- --configuration production
+        working-directory: ./web
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.x'
+
+      - name: Build with dotnet
+        run: dotnet build --configuration Release
+
+      - name: dotnet publish
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/myapp
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: .net-app
+      
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ omitted }}
+          tenant-id: ${{ omitted }}
+          subscription-id: ${{ omitted }}
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'corsoweb'
+          slot-name: 'Production'
+          package: .
+          
+```
+A few adjustments were needed in `Program.cs` to serve the frontend artifacts from the wwwroot folder:
+
+```c#
+app.UseExceptionHandler();
+app.UseHttpsRedirection();
+
+//added
+app.UseDefaultFiles();
+//added
+app.UseStaticFiles();
+
+app.UseCors("AllowCorsoWeb");
+app.UseSession();
+app.MapControllers();
+
+//added
+app.MapFallbackToFile("index.html");
+await app.RunAsync();
+```
+The order of these middlewares is important to avoid conflicts and unexpected behavior.
