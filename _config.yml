@@ -12,7 +12,7 @@ permalink:        pretty
 # Setup
 title:            AMF
 tagline:          'Code Confidential'
-description:      'Amf code confidential, document the journey of a free DEV, working from home having fun with code and contrary opinionated (No Hype).'
+description:      'Amf code confidential, thoughts, opinions and code lab on my own.'
 url:              https://amf-fs.github.io
 baseurl:          '/amf-code-confidential'  # the subpath of your site, e.g. /blog
 
@@ -20,7 +20,7 @@ author:
   name:           'Alan Morais Fialho'
   url:            https://www.linkedin.com/in/alan-morais-9b2070121/
 
-paginate:         1
+paginate:         5
 
 # Custom vars
 version:          2.1.0

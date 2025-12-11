@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Corso! Sprint 01
+tags: [journeys, Corso!]
 ---
 
 This is the continuation of the [Corso! the journey begins]({{'/2025/10/26/corso-journey-begins' | relative_url}}), showcasing the results of the first sprint.

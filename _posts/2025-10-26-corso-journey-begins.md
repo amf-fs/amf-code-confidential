@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Corso! The journey begins
+tags: [journeys, Corso!]
 ---
 
 ### Why blogging?

@@ -1,0 +1,11 @@
+.post-header{
+    border-bottom: 1px solid #e1e1e1;
+    margin-bottom: 20px;
+}
+
+.post-link{
+    color: #268bd2;
+    text-decoration: underline;
+    font-weight: normal;
+    line-height: 1;
+}

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Corso! Sprint 02
+tags: [journeys, Corso!]
 ---
 
 In sprint 02 I had very limited capacity to keep coding. I’ve been busy with consulting and other tasks related to the business, however, I still found some hours to work on it, and my solutions to make Corso! online took that into consideration.
