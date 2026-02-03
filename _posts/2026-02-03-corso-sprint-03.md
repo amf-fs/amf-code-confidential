@@ -4,15 +4,15 @@ title: Corso! Sprint 03
 tags: [journeys, Corso!]
 ---
 
-This is the first one on 2026, after vacations with no computer, just enjoying nature, surf and reflecting where I am headed. The sprint 03 goal was make Corso! more reliable for beta usage, we will be covering the progress next.
+This is the first one in 2026, after vacations with no computer just enjoying nature, surfing, and reflecting on where I'm headed. Sprint 03's goal was to make Corso! more reliable for beta usage. We'll cover the progress next.
 
 ## Adding a user context
 
-Corso! is live on Azure and one of points that I was not happy is that pretty much anyone could access the vault, even though on Sprint 02 we secured that with Cookie authentication in conjunction with a master password, I'd not like to let it open to anyone try brute-force the master password. I can leverage reliable features from Azure, one of them is "easy auth", a built-in secure authentication mechanism that does not require any code change, it pretty much add a front-door to your application and only invited users can view it.
+Corso! is live on Azure and one of the points I'm not happy with is that pretty much anyone could access the vault. Even though Sprint 02 secured it with cookie authentication and a master password, I didn't want to leave it open for anyone to brute-force the master password. I can leverage reliable features from Azure, including *Easy Auth*, a built-in secure authentication mechanism that doesn't require code changes. It essentially adds a front-door to your application only invited users can access it.
 
 ![easy auth]({{'assets/images/corso-sprint-03/easy-auth.png' | relative_url}})
 
-I'll not cover details in depth because I believe it is intuitive, there is a well known microsoft documentation how to use it. In summary you can "Add Provider", choose the authentication provider as you prefer, in my case I am using the MS one in combination with Microsoft Entra ID I can even invite external users that are interested at Corso! I did the test with another gmail account.
+I won't cover the details in depth because I believe it's intuitive. There's well-documented Microsoft documentation on how to use it. In summary, you can "Add Provider" and choose your preferred authentication provider. In my case, I'm using the Microsoft one combined with Microsoft Entra ID, so I can even invite external users interested in Corso! I tested it with another Gmail account.
 
 ![corso ms auth]({{'assets/images/corso-sprint-03/corso-ms-auth.png' | relative_url}})
 
@@ -20,13 +20,13 @@ I'll not cover details in depth because I believe it is intuitive, there is a we
 
 To make it useful somehow, I would need to dump all my registered accounts from 1Password to Corso! I found that it is possible to extract a CSV from there, and all relevant information I need is contained in the file. My decision was to create an upload mechanism tailored for the 1Password CSV file.
 
-Usually, the default decision is using a library that can parse CSV files. Parsing can contain so many edge cases that sometimes makes sense to use it. However, the philosophy here is to use as little 3rd-party code as possible only in areas where there is an evident security risk I off the work to someone who has already went through the path.
+Usually, the default decision is using a library that can parse CSV files. Parsing can have so many edge cases that sometimes it makes sense to use one. However, my philosophy here is to use as little third-party code as possible; only in areas where there's an obvious security risk. I offload the work to someone who's already handled the problem.
 
-Most of the features we've been building so far were not carrying heavy logic, so manual testing was enough to guarantee correctness. In the case of a parser, it's a little different. I'll read a CSV string and parse it into some C# `POCO` using reflection, which adds some spice to the game.
+Most features I've built so far weren't complex, so manual testing was enough to guarantee correctness. A parser is different. I'll read a CSV string and parse it into a C# `POCO` using reflection, which adds some spice to the work.
 
-Unit tests will be a smart way to guarantee that I am moving forward correct and in a good pace.
+Unit tests will be a smart way to guarantee I'm moving forward correctly and at a good pace.
 
-The parser design will take 2 steps: first, Validation, I’ll guarantee this is a valid and parsable CSV file; second, the parse itself. Below is the controller using the parser.
+The parser design takes 2 steps: first, *Validation* I guarantee the file is valid and parsable; second, the parse itself. Below is the controller using the parser.
 
 ```c#
 [HttpPost("import")]
@@ -58,14 +58,15 @@ public async Task<ActionResult> Import(IFormFile file)
 }
 ```
 
-I accept a file as input and open the stream that guarantees I'll not exhaust server memory, usually I am dealing with small files which makes things easier and most of them are buffered into memory, but larger files the framework saves it in a temp location, since this multi-part reading that contains boundaries we are able to read in parts without crashing the app. After opening the stream I can delegate the job to the parser, if any error encountered we are returning a bad request though some helper method I wrote to guarantee consistency with Problem details pattern that I've been using so far. 
+I accept a file as input and open the stream, which guarantees I won't exhaust server memory. I'm usually dealing with small files, which makes things easier. Most are buffered into memory, but for larger files, the framework saves to a temp location. Since this is multi-part reading with boundaries, we can read in chunks without crashing. After opening the stream, I delegate to the parser. If any error occurs, I return a bad request using a helper method to ensure consistency with the Problem Details pattern I've been using. 
 
 ## The parser
 
 ### Validation first
-I exposed a validation mechanism, to help developer guarantee the file is consistent before trying to parse it, since the parse method throws exception if finds the input is not in the expected format, so it will not be able to conclude the operation the ValidateAsync helps in a way to avoid let it throw and be handled on app level which often is not a good idea, there are performance concerns when dealing with api and if you can always provide a way to avoid Exception to be thrown then better. The Exception would be more as a big warning to the developer to act promptly at the issue.
 
-As mentioned before I choose write unit tests for this case, since the parser logic can be complex with lots of cases easy to break, but I would never write unit tests for the whole app specially in early stages, when you still collecting feedback where the right abstractions needs to play.
+I exposed a validation mechanism to help developers guarantee the file is consistent before parsing. Since the parse method throws an exception if it finds unexpected input, the `ValidateAsync` method helps avoid letting it throw and be handled at the app level; which is often not ideal. There are performance concerns with APIs, and if you can always provide a way to prevent exceptions, that's better. Exceptions are more like a big warning to the developer to act promptly on the issue.
+
+As mentioned earlier, I chose to write unit tests for this case since parser logic can be complex with many edge cases easy to break. However, I wouldn't write unit tests for the whole app, especially in early stages when you're still collecting feedback on the right abstractions.
 
 *Tests*
 
@@ -130,7 +131,7 @@ As mentioned before I choose write unit tests for this case, since the parser lo
 
 ```
 
-If you realize the tests are small focused and I wrote a couple of them, to guarantee the main validation logic works, I avoid as much as I can using test-doubles (Mocks, Stubs, Fakes..) There are cases they can help specially when dealing with a external system that you do not have control over, you can mimic behaviors that can enhance testability. In my case I am using a memory stream to pretend a Csv in a stream and it worked pretty well, one metric that I pay attention is how easy is to write those tests and how often when they break it catches a real bug. If your tests often breaks and no bug is encountered this a sign that your test suite is too fragile and you should rethink your approach how to write them. Maybe you are still exploring the design, maybe you are testing stuff that you should not because is way too close to the implementation detail, in many of those cases the best approach is to delete the test and come later when the idea is more mature. In terms of conventions I tried many different ones and I stick with naming my tests by scenarios e.g MatchingHeader and a more descriptive statement on display name using as guidance gherkin syntax but not getting it into the bones, I also think split the Arrange, Act, Assert sections is useful.
+If you notice, the tests are small and focused. I wrote a few to guarantee the main validation logic works. I avoid using test doubles (mocks, stubs, fakes) as much as possible. They can help with external systems you don't control, where you can mimic behaviors to enhance testability. In my case, I use a memory stream to simulate a CSV in a stream, and it worked well. One metric I track is how easy tests are to write and how often they catch real bugs when they break. If tests break frequently with no actual bugs, that's a sign your test suite is too fragile and needs rethinking. Perhaps you're exploring the design or testing implementation details too closely. In those cases, the best approach is to delete the test and revisit when the idea matures. For conventions, I tried many approaches and stick with naming tests by scenario (e.g., `MatchingHeader`) with descriptive display names using Gherkin syntax loosely. I also find splitting Arrange, Act, Assert sections useful.
 
 *Code*
 
@@ -205,13 +206,13 @@ public async Task<ValidationResult> ValidateAsync<T>(Stream stream, params Expre
 
 ```
 
-At first, there’s a validation for seekable streams. This happens because the class is designed for two steps, and I want the validation to avoid producing any side effects on the caller’s stream. That’s why the stream remains open, and at the end of the operation we reset it to the beginning inside the finally block. If the stream isn’t seekable, I can’t rewind it.
+At first, there's validation for seekable streams. This is necessary because the class is designed for two steps, and I want validation to avoid side effects on the caller's stream. The stream stays open, and we reset it to the beginning in the finally block. If the stream isn't seekable, I can't rewind it.
 
 I also added a `doNotValidate` option to exclude `POCO` properties that don’t perfectly match the CSV columns for example, the ID of an account, which is generated by the Vault. The loop uses reflection to compare property names from the given type against the CSV header. If any property isn’t found, it’s added to the missing fields collection, and later an error is returned to help identify where the mismatch occurred.
 
 ### Now parse it
 
-I'll not go over the parsing logic tests but it followed same guidelines from the validation logic, small, focused, easy to write and most important give feedback if I am doing any B/S. Below is the implementation, it was simple to write for my specific use case, not depending on any library at least for now sounds the right choice.
+I won't go over the parsing logic tests, but they followed the same guidelines as the validation logic; small, focused, easy to write, and most importantly, they give feedback if I'm doing B/S. Below is the implementation. It was simple to write for my specific use case without relying on any library. For now, that seems like the right choice.
 
 *Code*
 
