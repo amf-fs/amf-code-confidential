@@ -14,4 +14,61 @@ At beginning I did not find this is a big problem to solve it should be relative
 
 After confirming the approach we would take, I asked the agent to execute the task and then...
 
-**Disaster** it did lot's of modifications to the web project and in the end it even broke the build, I did another prompt telling to fix build issues without tha much explanation about the issues, at least it could fix. I did not start reviewing the code, I tried to test the app and it was so bad all the features were broken also it added custom css classes that caused horrendous user experience, not sure if there is a more appropriate model for it, but this is terrible for UI look and feel in general it needs the human input here. 
+**Disaster** it did lot's of modifications to the web project and in the end it even broke the build, I did another prompt telling to fix build issues without much guidance about the problems, at least it could fix. I tried to test the app, without any code review yet and it was so bad, all the features were broken, also it added custom css classes that caused horrendous user experience, not sure if there is a more appropriate model for it, but this is terrible for UI look and feel in general it needs the human input.
+
+You threat the agent as a jr engineer, you cannot throw a problem you will need to help breaking down in small activities that you are able to track the progress, and most important if this is headed to the right direction.
+
+## Let's give another try
+
+Despite the first experience has not produced good outcomes, it served as a kind of prototype, reviewing all code changes I had a better idea about the areas I would need to touch and then I started to reflect how I usually approach when I am doing a manual refactoring. I am a huge advocate of small verifiable changes, so I started break into some small tasks to achieve the design I would like. Below I'll start paste the prompts I used in italic and right after comment the outcomes, expect some typos and grammar mistakes.
+
+*Let's move the new account button to a action bar to the top and when clicked we will open a dialog with the account form, save and cancel options, so it will allow us create new accounts.*
+
+The one above has not produced good results, it did not take into consideration the libraries the project already contains such as Tailwind and Angular Material, so many unnecessary code was created, also the file names were poor not following the project conventions, changes that I have not asked for were introduced. I had to undo all changes, and now I have to be more specific.
+
+*Let's move the new account button to action bar to the top of the account component, the dialog I want it named as account-dialog.component, avoid create your own css the project already contains tailwind to help. The dialog should contain all account form logic, with fields, cancel and save buttons. Keep changes minimal*
+
+Now we made a good progress, however I had to prompt a little more for fixing compilation issues and remove changes I haven't asked for (this is the proactive jr. dev).
+
+*Now we will do similar task but with import csv feature, move the button to the action bar, and preserve the feature as is, the button has dual function choose a file and then later upload it keep that, I just want refactor the content disposition.*
+
+For my surprise things are getting better, now I had not to ask to fix compilation issues it seems the agent is learning, this is running *npm build* to check errors auto fixing them. Little back and forth because it forgot to move the delete button to unload the loaded file, and had introduced few bugs. The tool leave behind lot's of zombie unused code, then I had to ask to start clean up the things a little bit.
+
+At this point I started to develop some framework to work with it: 
+
+1. Create the prompt 
+2. Test 
+3. Review the code 
+4. Refactor 
+5. Test again.
+
+*Now we will add the edit feature, on the accoun-list instead of radio selection we will add an icon to edit and reuse the account-dialog, passing the accounts values to it, the tile should change dinamic like "Editing {{account.title}}", and the save should call the update method if account is provided, do not forget this is mobile friendly then if account title is too big we may need to truncate and add an elipsys to prevent overlapping* 
+
+The feature was kept intact but the UI was looking terrible it did not remove the selection button and replaced by edit icon, moreover we had overlapping issues between them. Couple more prompts and I could handle it, one thing to emphasize is that sometimes I still need to remember the tool to rely on libraries like Angular Material instead of building from scratch.
+
+*Now that we created the action bar at the top and transferred all account form features to the account model, we fully delete the account-form component and references pay attention to build issues and dead code.*
+
+Somehow it broke the dialog that was previously working despite I haven't mentioned anything related it did couple changes there, I did the analysis myself and point the issue to let it fix.
+
+*somehow you broke the dialog feature when I hit save is not passing proper account, to the api calls to POST and PUT*
+
+That one worked well and the bug was fixed.
+
+The tool has terrible sense of architecture and how to organize the code, at the end of this activity I had something working already quite surprising for a morning, not sure if I could achieve the same without it. So my last prompts were about refactoring the whole architecture into smaller more concise files.
+
+*there where I am highligthing, is the action bar, let's create a component for that called action-bar and let's sticky to the top when I am scrolling the list.* (back and forth here bugs with sticky to the top I end-up fixing manually)
+
+*all file handling should be transfered to action-bar, and maybe use output event when file is uploaded so it can refresh account list, same strategy when new account created*
+
+*for new account same strategy open dialog on action bar and raise an even only if new account created so account list can be refreshed* (some reason was adding white background to the action bar, who knows...)
+
+I had some struggle with the tool, because what sounds obvious to you can be totally analogous to the agent, but it was a good achievement for a whole morning, it definitely boost my outcome. 
+
+## My humble opinion
+
+
+
+
+
+
+
