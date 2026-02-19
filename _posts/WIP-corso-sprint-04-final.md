@@ -66,9 +66,25 @@ I had some struggle with the tool, because what sounds obvious to you can be tot
 
 ## My humble opinion
 
+If you are at least one decade in the tech industry you probably had seen the "Hype" a couple of times already, for the ones new to it here is how it works. It starts with some sort of innovation that cause real impact in how we deal software, second it get's exaggerated in a insane level that people think they discover the silver bullet, despite many advices and we know our work is mostly to deal with trade-offs, since they think is possible to use the new tool, solution or practice everywhere things start to go bad which I believe it is ok this would be a phase that we are discovering the real use cases and the limitations of this innovation, the limit always exist, lastly companies start to pay the price of abusing the technology and trying to fit on everything, some assume the losses and change direction, other group has the dumb ego inflated not assuming the reality and go bankruptcy. Examples of similar hypes were Blockchain, TDD, No-Code, Agile, Microservices...
 
+What this time surprised was the brutal marketing on AI tools and the fear created on people for loosing their jobs, it was so intense that naive VP's, Managers started to truly believe this could replace a engineer and we see now most Big Techs hiring the work force back, such a shame. I felt that it was a big lie and I just wait the hype come to me, yes I did not take any proactive action to go deeper into those tools because I knew this would stumble my door and I would need to catch up at least the basics that's what I call "paid learning", I remember being more interest and still true in cybersecurity than this tool. I did a quick look and realize ok this can help now I do not need my code generators anymore nor my bash scripts to refactor big code bases, but that's it you know, all decent engineers in some point were trying to generate code automatically because we were just tired of keeping writing same CRUD, login API again again, so we could focus where the real challenge was or up skill somewhere. 
 
+We are now in the last phase everyone is noticing there is a buble, no AGI will come and trillions were spent to build that without proper ROI.
 
+The tool boost the productivity no doubt about it, I do not want go back when I had to click on many links on Google to get an answer, but this needs to be treated as a "dumb intern" there is no way this will replace me, it can barely solve well-known problems without assistance and constant reviews, the quality / security still horrendous, which makes an awesome tool in the right hands, a true Sr. level engineer who knows the problem to be solved and is able to fix poor outcomes produced, it's an incredible tool for bootstrapping new code bases and big refactorings, however it make bad engineers extremely louder, which makes easy to identify them, recently I've being denying several pull request once I get back saying *"Hey at least did you review this code, before asking for?"* the default answer has been *"Ow, I did but this part was AI generated"*, you see now those people has excuse for their buggy crap work.
+
+Be mindfulness, it is easy to get addicted to the tool and start loosing your skill, I am making sure I use it in controlled manner, I never delegate 100% to the tool, making sure there are parts of the code that I still write by myself, this coming into a equation that my activity is even more enjoyable. My advice for the beginners avoid generate code with it as much as you can, there is no way for you to learn anything if you are not practicing, however this is now a huge ally to grasp more complex context in CS word, I've been leveraging it a lot.
+
+The message in the end is [don't give up your brain](https://cassidoo.co/post/good-brain/?ref=dailydev).
+
+## Corso! Will have a break
+
+I have been using Corso! activelly in my day to day and I am pretty satisfied with it, soon I can cancel my 1password subscription, I just need to finish minor adjustments like backup files and so on since this is a sensitive data that I cannot loose at any cost.
+
+I decided take a break after this first Release to focus in diferent projects in this 12 years in the industry I came to realize that I've never contributed to open-source, often way too busy with full-time jobs, that I've never found energy to do. 
+
+My goal now towards end of this year is embracing open source at least give some contributions learn the process how to get into it, and off course document the experience, hope will help, thanks for reading it!
 
 
 
