@@ -6,7 +6,7 @@ tags: [journeys, Corso!]
 
 ### Why blogging?
 
-After more than decade as a software engineer for a variety of different business mostly acting as Senior DEV, last 5 five years dedicated towards leadership positions as Architecture and Tech Lead, I decided to move to independent contractor. I just became a father big challenge is coming but pretty excited with it, the first decision was this one start work on my own, having control of my schedule and projects that I would like to engage. There are lots of ideas and experiences to share accumulated from 14 years in the industry. We will explore my journey on building real software and sharing critical opinion about related topics. Hope the free spirit will find meaning on that.
+After over a decade as a software engineer working with various businesses, mostly as a Senior DEV, the last five years have been dedicated to leadership roles as an Architecture and Tech Lead. I decided to become an independent contractor. I recently became a father, and a big challenge is ahead, but I am very excited about it. The first step was to start working on my own, gaining control of my schedule and choosing projects I want to pursue. I have many ideas and experiences from 12 years in the industry to share. We will explore my journey in building real software and sharing honest opinions about related topics. I hope the free spirit will find meaning in this.
 
 ### Hey Corso!
 
