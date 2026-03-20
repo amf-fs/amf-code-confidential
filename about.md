@@ -4,8 +4,6 @@ title: About
 permalink: /about/
 ---
 
-# About
-
 I am Alan Morais. I craft software to make a living in Brazil, on the coast surrounded by nature and good waves. 
 
 I grew up in São Paulo city and started getting into programming in 2009, back in the days, using VB.NET was not fun. When introduced to the web, I started to get excited about what could be achieved using Flash, HTML, CSS, and JavaScript. 
@@ -20,7 +18,7 @@ Outside of code crafting, I surf and spend time on the match, practicing Brazili
 
 This blog is intended to document my work and experiences for my own reference, with the hope of helping the community in some way. The content will be handcrafted, not AI-generated, using the tool to support research and non-core activities.
 
-# You can reach me at
+## You can reach me at
 
 alanmorais1503@gmail.com or [Linkedin](www.linkedin.com/in/alan-fialho-9b2070121/)
 
