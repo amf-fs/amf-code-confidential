@@ -20,7 +20,7 @@ This blog is intended to document my work and experiences for my own reference, 
 
 ## You can reach me at
 
-alanmorais1503@gmail.com or [Linkedin](www.linkedin.com/in/alan-fialho-9b2070121/)
+alanmorais1503@gmail.com or [LinkedIn](https://www.linkedin.com/in/alan-fialho-9b2070121/){:target="_blank" rel="noopener"}
 
 
 
