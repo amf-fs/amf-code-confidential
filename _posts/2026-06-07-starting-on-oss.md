@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Open source is not what I thought.
-tags: [Journeys, oss-guide]
+tags: [journeys, oss-guide]
 ---
 
 Over the last month I tried to get a grasp of open source. It's something I've always wished to accomplish, but I never found enough energy to start. By "energy" I mean 2-4 hours during the weekends to try it out, but due to the busy schedule of programming on weekdays (an average of 10 hours a day, sometimes including weekends) I always chose to spend my free time on other activities that bring me joy.
@@ -46,7 +46,7 @@ This [tutorial](https://www.youtube.com/watch?v=yzeVMecydCE){:target="blank" rel
 
 On my second try I stubbed across Bouncy Castle. I hadn't used the library before, but cryptography calls my attention, I naturally find myself digging into details of it.
 
-No success on finding any "good first issue", so I had the idea to fork the repo looking for "TODOs" on source code, by the way this is a smart strategy to begin with. I found a class called `DerInteger` one of the "TODOs" was pointing to deprecate some ctors in favor of a static method `ValueOf`, I thought this would be easier to accept and be merged, here is the [contribution](https://github.com/bcgit/bc-csharp/pull/680).
+No success on finding any "good first issue", so I had the idea to fork the repo looking for "TODOs" on source code, by the way this is a smart strategy to begin with. I found a class called `DerInteger` one of the "TODOs" was pointing to deprecate some ctors in favor of a static method `ValueOf`, I thought this would be easier to accept and be merged, here is the [contribution](https://github.com/bcgit/bc-csharp/pull/680){:target="blank" rel="noopener"}.
 
 Again; no traction.
 
