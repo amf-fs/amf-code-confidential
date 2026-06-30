@@ -12,7 +12,7 @@ permalink:        pretty
 # Setup
 title:            AMF
 tagline:          'Code Confidential'
-description:      'I am Alan Morais. I craft software to make a living in Brazil, this is my opinion.'
+description:      'I am Alan Morais. I craft software to make a living, this is my opinion.'
 url:              https://amf-fs.github.io
 baseurl:          '/amf-code-confidential'  # the subpath of your site, e.g. /blog
 
