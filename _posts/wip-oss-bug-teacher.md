@@ -23,7 +23,7 @@ After it I did a small analysis, and confirmed my approach with the maintainer w
 
 Quick summary about the issue, on Kestrel HTTP implementation there were a small bug when the server received newline chars characters `\n\r`, this was supposed to refuse such for [trailers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Trailer){:target="blank" rel="noopener"} and in HPACK Dynamic table retrieval, since both was not happening properly this was not in compliance with [RFC 7540 10.3](https://www.rfc-editor.org/rfc/rfc7540.html#section-10.3){:target="blank" rel="noopener"}.
 
-The bug fix was kinda trivial, I just had to flip over a flag because the actual validation was present in code already, but one of the maintainers suggestions was writing tests to lock down the behavior and here is where made me go into the bones to dissect some parts of the HTTP protocol and HPACK, later we will explore each test and the concepts behind.
+The bug fix was kinda trivial, I just had to flip over a flag because the actual validation was present in code already, but one of the maintainers suggestions was writing tests to lockdown the behavior and here is where made me go into the bones to dissect some parts of the HTTP protocol and HPACK, later we will explore each test and the concepts behind.
 
 The bug was fixed in two places: 
 
@@ -48,5 +48,51 @@ The bug was fixed in two places:
 
 ```
 
+## Testing trailers
 
+For me a new contributor to the framework, writing the tests was an extremely valuable effort, first let's dig into how we make sure, when newline characters as CR LF are sent into trailers the HTTP Connection is refusing it. For my luck there is already a written test for this scenario I just need to extend it.
 
+*Http2ConnectionTests.cs*
+```csharp
+[Theory]
+[MemberData(nameof(IllegalTrailerData))]
+public async Task HEADERS_Received_WithTrailers_ContainsIllegalTrailer_ConnectionError(byte[] trailers, string expectedErrorMessage)
+{
+    await InitializeConnectionAsync(_readTrailersApplication);
+
+    await SendHeadersAsync(1, Http2HeadersFrameFlags.END_HEADERS, _browserRequestHeaders);
+    await SendHeadersAsync(1, Http2HeadersFrameFlags.END_HEADERS | Http2HeadersFrameFlags.END_STREAM, trailers);
+
+    await WaitForConnectionErrorAsync<Http2ConnectionErrorException>(
+        ignoreNonGoAwayFrames: false,
+        expectedLastStreamId: 1,
+        expectedErrorCode: Http2ErrorCode.PROTOCOL_ERROR,
+        expectedErrorMessage: expectedErrorMessage);
+
+    AssertConnectionEndReason(ConnectionEndReason.InvalidRequestHeaders);
+}
+```
+There is already a test data called IllegalTrailerData, I just added my two new scenarios before patching the fix and waited for each to fail so I make sure the test is covering what I need.
+
+```diff
++   //Invalid header CR - contains-cr: \r
++   {
++       new byte[]{0x00, 0x0B}.Concat(Encoding.ASCII.GetBytes("contains-cr")).Concat(new byte[]{0x01, 0x0D}).ToArray(),
++       CoreStrings.BadRequest_MalformedRequestInvalidHeaders
++   },
++   //Invalid header LF - contains-lf: \n
++   {
++       new byte[]{0x00, 0x0B}.Concat(Encoding.ASCII.GetBytes("contains-lf")).Concat(new byte[]{0x01, 0x0A}).ToArray(),
++       CoreStrings.BadRequest_MalformedRequestInvalidHeaders
++   },
++   //Invalid header CR and LF - contains-crlf: \r\n
++   {
++       new byte[]{0x00, 0x0D}.Concat(Encoding.ASCII.GetBytes("contains-crlf")).Concat(new byte[]{0x02, 0x0D, 0x0A}).ToArray(),
++       CoreStrings.BadRequest_MalformedRequestInvalidHeaders
++   }
+```
+The test body itself is quite simple and the test api available makes easy to understand without gigging to much in details, short explanation it initialize a new HttpConnection for that you need an application, which pretty much are pre defined and tailored on base class to attend various scenarios, the app is anything that can process a Http request. Having a connection you can use pre built apis to send headers and data, in case we need trailer it needs to signalize this will end the stream along with trailers, then we just wait for the error to be returned, remember this is a web server so request are processed async in a loop, so you need that wait time.
+
+Now the fun part pay attention to the test data how I end up with those bytes? Here is where HPACK start to play and I had to go deeper to understand the basic of this encoding.
+
+## HPACk
